@@ -7,7 +7,6 @@ import requests
 import pandas as pd
 from tabula import read_pdf
 from sentence_transformers import SentenceTransformer, util
-from sklearn.metrics.pairwise import cosine_similarity  # Import cosine_similarity
 
 from utils import validate_url
 
