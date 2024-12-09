@@ -8,6 +8,7 @@ import pandas as pd
 from tabula import read_pdf
 from sentence_transformers import SentenceTransformer, util
 
+from images_utils import download_all_images, extract_table_from_image, table_to_dataframe
 from utils import validate_url
 
 # Target nutrition keys
@@ -219,6 +220,26 @@ def get_nutrition_data_from_pdf(restaurant, link):
     return nutrition_json
 
 
+def get_nutritional_facts_from_images(downloaded_images):
+    for image_path in downloaded_images:
+        table_data = extract_table_from_image(image_path)
+        print("Extracted Table Data:")
+        print(table_data)
+        df = table_to_dataframe(table_data)
+        print(df)
+
+
+def get_nutrition_data_from_html_page(restaurant, link):
+    keyword_filters = ['nutrition', 'table', 'facts', 'nutritional']  # Customize keywords as needed
+    downloaded_images = download_all_images(url, keyword_filters=keyword_filters)
+    if downloaded_images:
+        get_nutritional_facts_from_images(downloaded_images)
+    else:
+        return {}
+
+    return {}
+
+
 def main(restaurant, link):
     # Get the formatted link
     link = get_formatted_link(link)
@@ -226,11 +247,14 @@ def main(restaurant, link):
     link_type = guess_format_of_link(link)
     if "html" in link_type.lower():
         print("Given URL is a html web page")
+        nutritional_facts_json = get_nutrition_data_from_html_page(restaurant, link)
     elif "pdf" in link_type.lower():
-        print("Given URL is a pdf web page")
+        print("Given URL is a pdf file")
         nutritional_facts_json = get_nutrition_data_from_pdf(restaurant, link)
         print("\nNutritional Facts:\n")
         print(nutritional_facts_json)
+    elif "image" in link_type.lower():
+        print("Given URL is a Image file")
     else:
         print(f"Given URL is not a supported format: {link_type}", )
     return
